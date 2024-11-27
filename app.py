@@ -139,7 +139,7 @@ def upload_file():
         if missing_columns:
             os.remove(file_path)  # Remove invalid file
             return jsonify({
-                'error': 'Invalid CSV structure',
+                'error': "Invalid CSV structure. Please add these columns: 'Gene', 'Expression','Condition'",
                 'message': f'Missing required columns: {", ".join(missing_columns)}. Please check your file.'
             }), 400
     
