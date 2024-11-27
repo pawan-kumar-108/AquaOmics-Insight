@@ -47,12 +47,12 @@ def index():
             }
 
             '/view-results':{
-                'method': 'GET'
+                'method': 'GET',
                 'description': 'Call GET /view-results to see list of generated images'
             }
 
             '/results/<filename>': {
-                'method': 'GET'
+                'method': 'GET',
                 'description': 'Call GET /results/<filename> to view a specific image'
             }
         },
