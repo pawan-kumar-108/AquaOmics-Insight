@@ -45,6 +45,16 @@ def index():
                 'description': 'Download generated visualization results',
                 'response_type': 'ZIP file'
             }
+
+            '/view-results':{
+                'method': 'GET'
+                'description': 'Call GET /view-results to see list of generated images'
+            }
+
+            '/results/<filename>': {
+                'method': 'GET'
+                'description': 'Call GET /results/<filename> to view a specific image'
+            }
         },
         'supported_data_types': [
             'Genomics',
@@ -180,7 +190,50 @@ def download_results():
             'message': str(e)
         }), 500
 
-# Add error handlers for common HTTP errors
+
+@app.route('/view-results', methods=['GET'])
+def view_results():
+    """
+    List and view generated visualization results
+    """
+    try:
+        results_folder = app.config['RESULTS_FOLDER']
+        image_files = [f for f in os.listdir(results_folder) if f.endswith(('.png', '.svg', '.jpg'))]
+        
+        if not image_files:
+            return jsonify({
+                'message': 'No images generated yet',
+                'status': 'empty'
+            }), 404
+        
+        return jsonify({
+            'images': image_files,
+            'total_images': len(image_files)
+        }), 200
+    
+    except Exception as e:
+        return jsonify({
+            'error': 'Error listing results',
+            'message': str(e)
+        }), 500
+
+@app.route('/results/<filename>')
+def get_result_image(filename):
+    """
+    Serve a specific result image
+    """
+    try:
+        return send_file(os.path.join(app.config['RESULTS_FOLDER'], filename))
+    except FileNotFoundError:
+        return jsonify({
+            'error': 'Image not found',
+            'message': f'Image {filename} does not exist'
+        }), 404
+    
+
+
+
+#adding error handlers for common HTTP errors
 @app.errorhandler(404)
 def not_found(error):
     return jsonify({
@@ -190,6 +243,8 @@ def not_found(error):
             '/',
             '/upload',
             '/download-results'
+            '/view-results'
+            '/results/{filename}'
         ]
     }), 404
 
