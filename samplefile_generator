@@ -1,0 +1,117 @@
+import pandas as pd
+import numpy as np
+import random
+
+def generate_omics_dataset(num_samples=100):
+    """
+    Generate a comprehensive and clean omics dataset
+    
+    Args:
+    - num_samples: Number of samples to generate
+    
+    Returns:
+    - pandas DataFrame with validated omics data
+    """
+    # Define conditions with more meaningful representation
+    conditions = ['Healthy', 'Diseased', 'Stress']
+    
+    # Generate base data
+    data = {
+        'Sample_ID': [f'Sample_{i+1}' for i in range(num_samples)],
+        'Gene': [],
+        'Expression': [],
+        'Condition': []
+    }
+    
+    # Generate gene expression data
+    for i in range(num_samples):
+        # Select a random gene
+        gene = f'Gene_{random.randint(1, 50)}'
+        
+        # Select a condition
+        condition = random.choice(conditions)
+        
+        # Generate expression value based on condition
+        if condition == 'Healthy':
+            expression = np.random.normal(0, 1)  # Centered around 0
+        elif condition == 'Diseased':
+            expression = np.random.normal(2, 1)  # Shifted upwards
+        else:  # Stress
+            expression = np.random.normal(-2, 1)  # Shifted downwards
+        
+        # Add to data
+        data['Gene'].append(gene)
+        data['Expression'].append(round(expression, 4))
+        data['Condition'].append(condition)
+    
+    # Create DataFrame
+    df = pd.DataFrame(data)
+    
+    return df
+
+def validate_dataset(df):
+    """
+    Validate the generated dataset
+    
+    Args:
+    - df: pandas DataFrame to validate
+    
+    Returns:
+    - Boolean indicating if dataset is valid
+    """
+    # Check required columns
+    required_columns = ['Gene', 'Expression', 'Condition']
+    if not all(col in df.columns for col in required_columns):
+        print("Missing required columns")
+        return False
+    
+    # Check data types
+    if not (
+        df['Gene'].dtype == object and 
+        df['Expression'].dtype in ['float64', 'float32'] and 
+        df['Condition'].dtype == object
+    ):
+        print("Incorrect data types")
+        return False
+    
+    # Check for empty values
+    if df.isnull().any().any():
+        print("Contains null values")
+        return False
+    
+    return True
+
+def save_dataset(filename='omics_dataset.csv'):
+    """
+    Generate and save dataset
+    
+    Args:
+    - filename: Name of the file to save
+    """
+    # Generate dataset
+    df = generate_omics_dataset()
+    
+    # Validate dataset
+    if validate_dataset(df):
+        # Save to CSV
+        df.to_csv(filename, index=False)
+        print(f"Dataset saved successfully to {filename}")
+        
+        # Print first few rows and dataset info
+        print("\nDataset Preview:")
+        print(df.head())
+        print("\nDataset Information:")
+        print(df.info())
+    else:
+        print("Dataset generation failed validation")
+
+# Run the script
+if __name__ == '__main__':
+    save_dataset()
+
+    # Additional validation checks
+    df = pd.read_csv('omics_dataset.csv')
+    print("\nRead Dataset Preview:")
+    print(df.head())
+    print("\nRead Dataset Information:")
+    print(df.info())
