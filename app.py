@@ -44,12 +44,12 @@ def index():
                 'method': 'GET',
                 'description': 'Download generated visualization results',
                 'response_type': 'ZIP file'
-            }
+            },
 
             '/view-results':{
                 'method': 'GET',
                 'description': 'Call GET /view-results to see list of generated images'
-            }
+            },
 
             '/results/<filename>': {
                 'method': 'GET',
